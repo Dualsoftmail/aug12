@@ -1,0 +1,302 @@
+create table dept(
+deptno number(2,0),
+dname varchar2(14),
+loc varchar2(13),
+constraint pk_dept primary key (deptno)
+);
+
+-- Add Records
+
+-- Insert row into DEPT table using named columns.
+insert into DEPT (DEPTNO, DNAME, LOC)
+values(10, 'ACCOUNTING', 'NEW YORK');
+-- Insert a row into DEPT table by column position.
+
+
+insert into dept
+values(20, 'RESEARCH', 'DALLAS');
+insert into dept
+values(30, 'SALES', 'CHICAGO');
+insert into dept
+values(40, 'OPERATIONS', 'BOSTON');
+
+create table emp (
+empno number(4,0),
+ename varchar2(10),
+job varchar2(9),
+mgr number(4,0),
+hiredate date,
+sal number(7,2),
+comm number(7,2),
+deptno number(2,0),
+constraint pk_emp primary key (empno),
+constraint fk_deptno foreign key (deptno) references dept (deptno)
+);
+
+
+-- Add Records
+
+insert into emp
+values(7839, 'KING', 'PRESIDENT', null,
+to_date('17-11-1981','dd-mm-yyyy'),
+5000, null, 10
+);
+
+
+insert into emp
+values( 7698, 'BLAKE', 'MANAGER', 7839,
+to_date('1-5-1981','dd-mm-yyyy'),
+2850, null, 30
+);
+
+
+insert into emp
+values(7782, 'CLARK', 'MANAGER', 7839,
+to_date('9-6-1981','dd-mm-yyyy'),
+2450, null, 10
+);
+
+
+insert into emp
+values( 7566, 'JONES', 'MANAGER', 7839,
+to_date('2-4-1981','dd-mm-yyyy'),
+2975, null, 20
+);
+
+
+--4 is done
+insert into emp
+values(
+7788, 'SCOTT', 'ANALYST', 7566,
+to_date('13-JUL-87','dd-mm-rr') - 85,
+3000, null, 20
+);
+
+
+insert into emp
+values(
+7902, 'FORD', 'ANALYST', 7566,
+to_date('3-12-1981','dd-mm-yyyy'),
+3000, null, 20
+);
+
+insert into emp
+values(
+7369, 'SMITH', 'CLERK', 7902,
+to_date('17-12-1980','dd-mm-yyyy'),
+800, null, 20
+);
+
+
+insert into emp
+values(
+7499, 'ALLEN', 'SALESMAN', 7698,
+to_date('20-2-1981','dd-mm-yyyy'),
+1600, 300, 30
+);
+
+
+--4 is done
+insert into emp
+values(
+7521, 'WARD', 'SALESMAN', 7698,
+to_date('22-2-1981','dd-mm-yyyy'),
+1250, 500, 30
+);
+
+
+insert into emp
+values(
+7654, 'MARTIN', 'SALESMAN', 7698,
+to_date('28-9-1981','dd-mm-yyyy'),
+1250, 1400, 30
+);
+
+
+insert into emp
+values(
+7844, 'TURNER', 'SALESMAN', 7698,
+to_date('8-9-1981','dd-mm-yyyy'),
+1500, 0, 30
+);
+
+
+insert into emp
+values(
+7876, 'ADAMS', 'CLERK', 7788,
+to_date('13-JUL-87', 'dd-mm-rr') - 51,
+1100, null, 20
+);
+
+
+-- 4 is done
+insert into emp
+values(
+7900, 'JAMES', 'CLERK', 7698,
+to_date('3-12-1981','dd-mm-yyyy'),
+950, null, 30
+);
+
+
+insert into emp
+values(
+7934, 'MILLER', 'CLERK', 7782,
+to_date('23-1-1982','dd-mm-yyyy'),
+1300, null, 10
+);
+After creating the dept, and emp two tables and inserting records - write the following queries
+
+A) Find who is making Max Salary in Department 30   (use a child query)
+SELECT ename
+FROM emp
+WHERE deptno = 30
+  AND sal = (SELECT MAX(sal) FROM emp WHERE deptno = 30);
+
+B) Find who all are working in New York (use a child query)
+SELECT ename
+FROM emp
+WHERE deptno IN (SELECT deptno FROM dept WHERE loc = 'NEW YORK');
+
+C) Find who are making more than Average Salary in Department 10 (use a child query)
+SELECT ename
+FROM emp
+WHERE deptno = 10
+  AND sal > (SELECT AVG(sal) FROM emp WHERE deptno = 10);
+
+D) Show Ename, SAL,  LOC for Department 10 and 20  (perform  a join)
+SELECT e.ename, e.sal, d.loc
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE e.deptno IN (10, 20);
+
+E) Show how many employees work for each department (use group by command)
+SELECT d.dname, COUNT(e.empno) as employee_count
+FROM dept d
+LEFT JOIN emp e ON d.deptno = e.deptno
+GROUP BY d.dname;
+
+F) Show how many employee lives in each City (grouping)
+SELECT d.loc, COUNT(e.empno) as employee_count
+FROM dept d
+LEFT JOIN emp e ON d.deptno = e.deptno
+GROUP BY d.loc;
+
+G)  Show Ename, Deptno, JOB and DName for employees who are working in Deptno in 10
+SELECT e.ename, e.deptno, e.job, d.dname
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE e.deptno = 10;
+
+H) Show Empno, Deptno, Ename, Sal, Loc for employees who are working in Chicago
+SELECT e.empno, e.deptno, e.ename, e.sal, d.loc
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE d.loc = 'CHICAGO';
+
+K) Show Total salary for each department
+SELECT d.dname, SUM(e.sal) as total_salary
+FROM dept d
+LEFT JOIN emp e ON d.deptno = e.deptno
+GROUP BY d.dname;
+
+L) Show Max Salary for each department
+SELECT d.dname, MAX(e.sal) as max_salary
+FROM dept d
+LEFT JOIN emp e ON d.deptno = e.deptno
+GROUP BY d.dname;
+
+M) Show employees count for department where employee count is at least greater than 4
+SELECT d.dname, COUNT(e.empno) as employee_count
+FROM dept d
+LEFT JOIN emp e ON d.deptno = e.deptno
+GROUP BY d.dname
+HAVING COUNT(e.empno) > 4;
+
+
+N)Create two tables:  class A (id, fname, grade), Class B (id, fname, grade) , insert records, some records are in both tables, and some records are only exist in one of the table
+Perform union, union all, minus and intersect:
+-- Create table Class A
+CREATE TABLE class_a (
+    id number,
+    fname varchar2(10),
+    grade number
+);
+
+-- Create table Class B
+CREATE TABLE class_b (
+    id number,
+    fname varchar2(10),
+    grade number
+);
+
+O)  Show who is hired in JUN month and making more than 2000
+SELECT ename
+FROM emp
+WHERE EXTRACT(MONTH FROM hiredate) = 6
+  AND sal > 2000;
+
+P)  Show who is in department 10 is making salary between 2000 to 5000
+SELECT ename
+FROM emp
+WHERE deptno = 10
+  AND sal BETWEEN 2000 AND 5000;
+
+
+Q)  Show number of employees in each Job title
+SELECT job, COUNT(*) as employee_count
+FROM emp
+GROUP BY job;
+
+
+R)  Show number of employees in each department
+SELECT deptno, COUNT(*) as employee_count
+FROM emp
+GROUP BY deptno;
+
+S)  Show which department has highest employees
+SELECT deptno, COUNT(*) as employee_count
+FROM emp
+GROUP BY deptno
+HAVING COUNT(*) = (SELECT MAX(employee_count) FROM (SELECT deptno, COUNT(*) as employee_count FROM emp GROUP BY deptno));
+
+T)  Show which year we hired most of employees
+SELECT EXTRACT(YEAR FROM hiredate) as hire_year, COUNT(*) as employee_count
+FROM emp
+GROUP BY EXTRACT(YEAR FROM hiredate)
+HAVING COUNT(*) = (SELECT MAX(employee_count) FROM (SELECT EXTRACT(YEAR FROM hiredate) as hire_year, COUNT(*) as employee_count FROM emp GROUP BY EXTRACT(YEAR FROM hiredate)));
+
+U) Show who is the youngest employee
+SELECT ename
+FROM emp
+WHERE hiredate = (SELECT MIN(hiredate) FROM emp);
+
+V) Show who is the eldest employee
+SELECT ename
+FROM emp
+WHERE hiredate = (SELECT MAX(hiredate) FROM emp);
+
+W) Show who are living in New York and making more than 2000 salary
+SELECT e.ename
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE d.loc = 'NEW YORK'
+  AND e.sal > 2000;
+
+X) Show who are living in Chicago and working for Department 10
+SELECT e.ename
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE d.loc = 'CHICAGO'
+  AND e.deptno = 10;
+
+Y) Show who are working in department 10 and 20 and living in New York
+SELECT e.ename
+FROM emp e
+JOIN dept d ON e.deptno = d.deptno
+WHERE (e.deptno = 10 OR e.deptno = 20)
+  AND d.loc = 'NEW YORK';
+
+Z) Show which deparment we do not have employee
+SELECT deptno
+FROM dept
+WHERE deptno NOT IN (SELECT deptno FROM emp);
